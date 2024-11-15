@@ -8,10 +8,9 @@ import org.spongepowered.asm.mixin.gen.Accessor;
 import net.minecraftforge.common.ForgeHooks;
 
 @Mixin(ForgeHooks.class)
-public interface ForgeHooksAccessor
-{
+public interface ForgeHooksAccessor {
 	@Accessor(remap = false)
-	public static ThreadLocal<Deque> getLootContext()
+	static ThreadLocal<Deque> getLootContext()
 	{
 		return null;
 	}

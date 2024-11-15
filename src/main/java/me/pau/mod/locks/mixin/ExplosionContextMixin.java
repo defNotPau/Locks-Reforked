@@ -1,28 +1,32 @@
 package me.pau.mod.locks.mixin;
 
 import java.util.Optional;
+import java.util.Set;
 
+import net.minecraft.world.level.Explosion;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
+import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
-import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
-import me.pau.mod.locks.common.item.LockItem;
-import me.pau.mod.locks.common.util.LocksPredicates;
 import me.pau.mod.locks.common.util.LocksUtil;
-import net.minecraft.block.BlockState;
-import net.minecraft.fluid.FluidState;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.Explosion;
-import net.minecraft.world.ExplosionContext;
-import net.minecraft.world.IBlockReader;
+import net.minecraft.core.BlockPos;
+import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
-@Mixin(ExplosionContext.class)
-public class ExplosionContextMixin
-{
-	@Inject(at = @At("RETURN"), method = "getBlockExplosionResistance(Lnet/minecraft/world/Explosion;Lnet/minecraft/world/IBlockReader;Lnet/minecraft/util/math/BlockPos;Lnet/minecraft/block/BlockState;Lnet/minecraft/fluid/FluidState;)Ljava/util/Optional;", cancellable = true)
-	private void getBlockExplosionResistance(Explosion ex, IBlockReader world, BlockPos pos, BlockState state, FluidState fluid, CallbackInfoReturnable<Optional<Float>> cir)
+@Mixin(Explosion.class)
+public class ExplosionContextMixin {
+	@Shadow @Final private Level level;
+
+	@Inject(at = @At(value = "INVOKE", target = "Ljava/util/Set;add(Ljava/lang/Object;)Z", shift = At.Shift.AFTER), method = "explode", locals = LocalCapture.CAPTURE_FAILSOFT)
+	private void removeBlockSet(CallbackInfo ci, Set<BlockPos> set, int i, int j, int k, int l, double d0, double d1, double d2, double d3, float f, double d4, double d6, double d8, float f1, BlockPos blockpos, BlockState blockstate, FluidState fluidstate, Optional<Float> optional)
 	{
-		cir.setReturnValue(cir.getReturnValue().map(r -> Math.max(r, LocksUtil.intersecting(ex.level, pos).filter(LocksPredicates.LOCKED).findFirst().map(lkb -> LockItem.getResistance(lkb.stack)).orElse(0))));
+		if (LocksUtil.lockedAndRelated(this.level, blockpos)) {
+			set.remove(blockpos);
+		}
 	}
 }

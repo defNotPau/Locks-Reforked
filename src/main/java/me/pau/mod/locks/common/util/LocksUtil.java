@@ -9,15 +9,18 @@ import java.nio.charset.StandardCharsets;
 import java.util.Deque;
 import java.util.stream.Stream;
 
+import me.pau.mod.locks.mixin.LootPoolAccessor;
+import me.pau.mod.locks.mixin.LootTableAccessor;
+
 import com.google.gson.JsonElement;
 import com.google.gson.JsonSyntaxException;
 
 import me.pau.mod.locks.common.init.LocksCapabilities;
 import me.pau.mod.locks.mixin.ForgeHooksAccessor;
-import me.pau.mod.locks.mixin.LootPoolAccessor;
-import me.pau.mod.locks.mixin.LootTableAccessor;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.DoorBlock;
 import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraftforge.common.loot.LootModifierManager;
@@ -128,7 +131,7 @@ public final class LocksUtil {
 
 	// Only merges entries, not conditions and functions
 	public static LootTable mergeEntries(LootTable table, LootTable inject) {
-		for(LootPool injectPool : (LootTableAccessor) inject.getPools()) {
+		for(LootPool injectPool : ((LootTableAccessor) inject.getPools())) {
 			LootPool pool = table.getPool(injectPool.getName());
 			if(pool == null)
 				table.addPool(injectPool);
@@ -136,6 +139,13 @@ public final class LocksUtil {
 				((LootPoolAccessor) pool).getEntries().addAll(((LootPoolAccessor) injectPool).getEntries());
 		}
 		return table;
+	}
+
+	public static boolean lockedAndRelated(Level world, BlockPos pos) {
+		BlockPos above = pos.above();
+		Block aboveBlock = world.getBlockState(above).getBlock();
+		boolean checkAbove = LocksUtil.locked(world, above) && aboveBlock instanceof DoorBlock;
+		return locked(world, pos) || checkAbove;
 	}
 
 	public static Stream<Lockable> intersecting(Level world, BlockPos pos) {

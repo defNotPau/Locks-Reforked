@@ -1,5 +1,10 @@
 package me.pau.mod.locks.mixin;
 
+import net.minecraft.network.protocol.game.ClientboundLevelChunkWithLightPacket;
+import net.minecraft.server.level.ChunkMap;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraftforge.network.PacketDistributor;
+import org.apache.commons.lang3.mutable.MutableObject;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -8,19 +13,13 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import me.pau.mod.locks.common.init.LocksCapabilities;
 import me.pau.mod.locks.common.init.LocksNetwork;
 import me.pau.mod.locks.common.network.toclient.AddLockableToChunkPacket;
-import net.minecraft.entity.player.ServerPlayerEntity;
-import net.minecraft.network.IPacket;
-import net.minecraft.world.chunk.Chunk;
-import net.minecraft.world.server.ChunkManager;
-import net.minecraftforge.fml.network.PacketDistributor;
+import net.minecraft.world.level.chunk.LevelChunk;
 
-@Mixin(ChunkManager.class)
-public class ChunkManagerMixin
-{
-	@Inject(at = @At("TAIL"), method = "playerLoadedChunk(Lnet/minecraft/entity/player/ServerPlayerEntity;[Lnet/minecraft/network/IPacket;Lnet/minecraft/world/chunk/Chunk;)V")
-	private void playerLoadedChunk(ServerPlayerEntity player, IPacket<?>[] pkts, Chunk ch, CallbackInfo ci)
-	{
+@Mixin(ChunkMap.class)
+public class ChunkManagerMixin {
+	@Inject(at = @At("TAIL"), method = "playerLoadedChunk")
+	private void playerLoadedChunk(ServerPlayer player, MutableObject<ClientboundLevelChunkWithLightPacket> pkts, LevelChunk ch, CallbackInfo ci) {
 		ch.getCapability(LocksCapabilities.LOCKABLE_STORAGE).orElse(null).get().values()
-			.forEach(lkb -> LocksNetwork.MAIN.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), new AddLockableToChunkPacket(lkb, ch)));
+				.forEach(lkb -> LocksNetwork.MAIN.send(PacketDistributor.TRACKING_CHUNK.with(() -> ch), new AddLockableToChunkPacket(lkb, ch)));
 	}
 }

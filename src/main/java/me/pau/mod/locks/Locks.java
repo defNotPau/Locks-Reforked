@@ -1,7 +1,6 @@
 package me.pau.mod.locks;
 
 import com.mojang.logging.LogUtils;
-import com.mojang.math.Vector3f;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import org.slf4j.Logger;

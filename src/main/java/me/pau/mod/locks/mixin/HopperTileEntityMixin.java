@@ -6,18 +6,15 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 import me.pau.mod.locks.common.util.LocksUtil;
-import net.minecraft.inventory.IInventory;
-import net.minecraft.tileentity.HopperTileEntity;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.world.Container;
+import net.minecraft.world.level.block.entity.HopperBlockEntity;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 
-@Mixin(HopperTileEntity.class)
-public class HopperTileEntityMixin
-{
-	@Inject(at = @At("HEAD"), method = "getContainerAt(Lnet/minecraft/world/World;DDD)Lnet/minecraft/inventory/IInventory;", cancellable = true)
-	private static void getContainerAt(World world, double x, double y, double z, CallbackInfoReturnable<IInventory> cir)
-	{
-		if(LocksUtil.locked(world, new BlockPos(x, y, z)))
-			cir.setReturnValue(null);
+@Mixin(HopperBlockEntity.class)
+public class HopperTileEntityMixin {
+	@Inject(at = @At("HEAD"), method = "getContainerAt(Lnet/minecraft/world/level/Level;DDD)Lnet/minecraft/world/Container;", cancellable = true)
+	private static void getContainerAt(Level world, double x, double y, double z, CallbackInfoReturnable<Container> cir) {
+		if(LocksUtil.locked(world, new BlockPos(x, y, z))) cir.setReturnValue(null);
 	}
 }

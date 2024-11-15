@@ -17,7 +17,6 @@
       "LockableTileEntityMixin",
       "LootPoolAccessor",
       "LootTableAccessor",
-      "LootTableManagerMixin",
       "PistonBlockMixin",
       "PistonBlockStructureHelperMixin",
       "ServerWorldMixin",

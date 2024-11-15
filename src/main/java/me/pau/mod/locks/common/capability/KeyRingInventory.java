@@ -3,39 +3,34 @@ package me.pau.mod.locks.common.capability;
 import javax.annotation.Nonnull;
 
 import me.pau.mod.locks.common.init.LocksItemTags;
-import net.minecraft.item.ItemStack;
-import net.minecraft.nbt.CompoundNBT;
-import net.minecraft.nbt.ListNBT;
-import net.minecraftforge.common.util.Constants;
+import net.minecraft.nbt.Tag;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemHandlerHelper;
 
 // Thanks to Gigaherz
-public class KeyRingInventory implements IItemHandlerModifiable
-{
+public class KeyRingInventory implements IItemHandlerModifiable {
 	public final int size;
 	public final ItemStack stack;
 
-	public KeyRingInventory(ItemStack stack, int rows, int col)
-	{
+	public KeyRingInventory(ItemStack stack, int rows, int col) {
 		this.size = rows * col;
 		this.stack = stack;
 	}
 
 	@Override
-	public int getSlots()
-	{
+	public int getSlots() {
 		return this.size;
 	}
 
 	@Override
-	public ItemStack getStackInSlot(int slot)
-	{
+	public ItemStack getStackInSlot(int slot) {
 		this.validateSlotIndex(slot);
-		ListNBT list = this.stack.getOrCreateTag().getList("Items", Constants.NBT.TAG_COMPOUND);
-		for(int a = 0; a < list.size(); a++)
-		{
-			CompoundNBT nbt = list.getCompound(a);
+		ListTag list = this.stack.getOrCreateTag().getList("Items", Tag.TAG_COMPOUND);
+		for(int a = 0; a < list.size(); a++) {
+			CompoundTag nbt = list.getCompound(a);
 			if(nbt.getInt("Slot") != slot)
 				continue;
 			return ItemStack.of(nbt);
@@ -44,20 +39,17 @@ public class KeyRingInventory implements IItemHandlerModifiable
 	}
 
 	@Override
-	public void setStackInSlot(int slot, ItemStack stack)
-	{
+	public void setStackInSlot(int slot, ItemStack stack) {
 		this.validateSlotIndex(slot);
-		CompoundNBT nbt = null;
-		if(!stack.isEmpty())
-		{
-			nbt = new CompoundNBT();
+		CompoundTag nbt = null;
+		if(!stack.isEmpty()) {
+			nbt = new CompoundTag();
 			nbt.putInt("Slot", slot);
 			stack.save(nbt);
 		}
-		ListNBT list = this.stack.getOrCreateTag().getList("Items", Constants.NBT.TAG_COMPOUND);
-		for(int a = 0; a < list.size(); a++)
-		{
-			CompoundNBT existing = list.getCompound(a);
+		ListTag list = this.stack.getOrCreateTag().getList("Items", Tag.TAG_COMPOUND);
+		for(int a = 0; a < list.size(); a++) {
+			CompoundTag existing = list.getCompound(a);
 			if(existing.getInt("Slot") != slot)
 				continue;
 			if(!stack.isEmpty())
@@ -72,15 +64,13 @@ public class KeyRingInventory implements IItemHandlerModifiable
 	}
 
 	@Override
-	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate)
-	{
+	public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
 		if (stack.isEmpty())
 			return ItemStack.EMPTY;
 		this.validateSlotIndex(slot);
 		ItemStack existing = getStackInSlot(slot);
 		int limit = stack.getMaxStackSize();
-		if (!existing.isEmpty())
-		{
+		if (!existing.isEmpty()) {
 			if (!ItemHandlerHelper.canItemStacksStack(stack, existing))
 				return stack;
 			limit -= existing.getCount();
@@ -88,8 +78,7 @@ public class KeyRingInventory implements IItemHandlerModifiable
 		if (limit <= 0)
 			return stack;
 		boolean reachedLimit = stack.getCount() > limit;
-		if (!simulate)
-		{
+		if (!simulate) {
 			if (existing.getCount() <= 0)
 				existing = reachedLimit ? ItemHandlerHelper.copyStackWithSize(stack, limit) : stack;
 			else
@@ -100,8 +89,7 @@ public class KeyRingInventory implements IItemHandlerModifiable
 	}
 
 	@Override
-	public ItemStack extractItem(int slot, int amount, boolean simulate)
-	{
+	public ItemStack extractItem(int slot, int amount, boolean simulate) {
 		if (amount == 0)
 			return ItemStack.EMPTY;
 		this.validateSlotIndex(slot);
@@ -109,14 +97,11 @@ public class KeyRingInventory implements IItemHandlerModifiable
 		if (existing.isEmpty())
 			return ItemStack.EMPTY;
 		int toExtract = Math.min(amount, existing.getMaxStackSize());
-		if (existing.getCount() <= toExtract)
-		{
+		if (existing.getCount() <= toExtract) {
 			if (!simulate)
 					this.setStackInSlot(slot, ItemStack.EMPTY);
 			return existing;
-		}
-		else
-		{
+		} else {
 			if (!simulate)
 				this.setStackInSlot(slot, ItemHandlerHelper.copyStackWithSize(existing, existing.getCount() - toExtract));
 			return ItemHandlerHelper.copyStackWithSize(existing, toExtract);
@@ -138,6 +123,6 @@ public class KeyRingInventory implements IItemHandlerModifiable
 	@Override
 	public boolean isItemValid(int slot, @Nonnull ItemStack stack)
 	{
-		return stack.getItem().is(LocksItemTags.KEYS);
+		return stack.is(LocksItemTags.KEYS);
 	}
 }

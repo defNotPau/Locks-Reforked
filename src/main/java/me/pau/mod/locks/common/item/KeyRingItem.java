@@ -9,21 +9,21 @@ import me.pau.mod.locks.common.container.KeyRingContainer;
 import me.pau.mod.locks.common.init.LocksSoundEvents;
 import me.pau.mod.locks.common.util.Lockable;
 import me.pau.mod.locks.common.util.LocksUtil;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.entity.player.ServerPlayerEntity;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.ActionResult;
-import net.minecraft.util.ActionResultType;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.util.SoundCategory;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.network.NetworkHooks;
-import net.minecraftforge.items.CapabilityItemHandler;
 import net.minecraftforge.items.IItemHandler;
 
 public class KeyRingItem extends Item {
@@ -36,11 +36,11 @@ public class KeyRingItem extends Item {
 
 	@Override
 	public ICapabilityProvider initCapabilities(ItemStack stack, CompoundTag nbt) {
-		return new CapabilityProvider(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY, new KeyRingInventory(stack, this.rows, 9));
+		return new CapabilityProvider(ForgeCapabilities.ITEM_HANDLER, new KeyRingInventory(stack, this.rows, 9));
 	}
 
 	public static boolean containsId(ItemStack stack, int id) {
-		IItemHandler inv = stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
+		IItemHandler inv = stack.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
 		for(int a = 0; a < inv.getSlots(); ++a)
 			if(LockingItem.getOrSetId(inv.getStackInSlot(a)) == id)
 				return true;
@@ -48,33 +48,33 @@ public class KeyRingItem extends Item {
 	}
 
 	@Override
-	public ActionResult<ItemStack> use(Level world, Player player, InteractionHand hand) {
+	public InteractionResultHolder<ItemStack> use(Level world, Player player, InteractionHand hand) {
 		ItemStack stack = player.getItemInHand(hand);
 		if(!player.level.isClientSide)
-			NetworkHooks.openGui((ServerPlayerEntity) player, new KeyRingContainer.Provider(stack), new KeyRingContainer.Writer(hand));
-		return new ActionResult<>(ActionResultType.PASS, stack);
+			NetworkHooks.openScreen((ServerPlayer) player, new KeyRingContainer.Provider(stack), new KeyRingContainer.Writer(hand));
+		return new InteractionResultHolder<>(InteractionResult.PASS, stack);
 	}
 
 	@Override
-	public ActionResultType useOn(UseOnContext ctx) {
+	public InteractionResult useOn(UseOnContext ctx) {
 		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
-		IItemHandler inv = ctx.getItemInHand().getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY).orElse(null);
+		IItemHandler inv = ctx.getItemInHand().getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
 		List<Lockable> intersect = LocksUtil.intersecting(world, pos).collect(Collectors.toList());
 		if(intersect.isEmpty())
-			return ActionResultType.PASS;
+			return InteractionResult.PASS;
 		for(int a = 0; a < inv.getSlots(); ++a) {
 			int id = LockingItem.getOrSetId(inv.getStackInSlot(a));
 			List<Lockable> match = intersect.stream().filter(lkb -> lkb.lock.id == id).collect(Collectors.toList());
 			if(match.isEmpty())
 				continue;
-			world.playSound(ctx.getPlayer(), pos, LocksSoundEvents.LOCK_OPEN.get(), SoundCategory.BLOCKS, 1f, 1f);
+			world.playSound(ctx.getPlayer(), pos, LocksSoundEvents.LOCK_OPEN.get(), SoundSource.BLOCKS, 1f, 1f);
 			if(world.isClientSide)
-				return ActionResultType.SUCCESS;
+				return InteractionResult.SUCCESS;
 			for(Lockable lkb : match)
 				lkb.lock.setLocked(!lkb.lock.isLocked());
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		}
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }
