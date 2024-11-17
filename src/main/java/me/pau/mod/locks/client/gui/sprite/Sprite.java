@@ -3,17 +3,15 @@ package me.pau.mod.locks.client.gui.sprite;
 import java.util.ArrayDeque;
 import java.util.Queue;
 
-import com.mojang.blaze3d.matrix.MatrixStack;
-
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Vector3f;
 import me.pau.mod.locks.client.gui.sprite.action.IAction;
 import me.pau.mod.locks.client.util.LocksClientUtil;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public class Sprite
-{
+public class Sprite {
 	private Queue<IAction> actions = new ArrayDeque<>(4);
 	public TextureInfo tex;
 	public float posX , posY, oldPosX, oldPosY, speedX, speedY, rot, oldRot, rotSpeed, originX, originY, alpha = 1f, oldAlpha = 1f;
@@ -23,29 +21,25 @@ public class Sprite
 		this.tex = tex;
 	}
 
-	public Sprite position(float posX, float posY)
-	{
+	public Sprite position(float posX, float posY) {
 		this.posX = this.oldPosX = posX;
 		this.posY = this.oldPosY = posY;
 		return this;
 	}
 
-	public Sprite rotation(float rot, float originX, float originY)
-	{
+	public Sprite rotation(float rot, float originX, float originY) {
 		this.rot = this.oldRot = rot;
 		this.originX = originX;
 		this.originY = originY;
 		return this;
 	}
 
-	public Sprite alpha(float alpha)
-	{
+	public Sprite alpha(float alpha) {
 		this.alpha = this.oldAlpha = alpha;
 		return this;
 	}
 
-	public void execute(IAction... actions)
-	{
+	public void execute(IAction... actions) {
 		for(IAction action : actions)
 			this.actions.offer(action);
 	}
@@ -56,8 +50,7 @@ public class Sprite
 	}
 
 	// FIXME new quat obj every frame? JFC
-	public void draw(MatrixStack mtx, float partialTick)
-	{
+	public void draw(PoseStack mtx, float partialTick) {
 		if(this.alpha <= 0f)
 			return;
 		mtx.pushPose();
@@ -68,8 +61,7 @@ public class Sprite
 		mtx.popPose();
 	}
 
-	public void update()
-	{
+	public void update() {
 		this.oldPosX = this.posX;
 		this.oldPosY = this.posY;
 		this.oldRot = this.rot;

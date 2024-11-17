@@ -5,6 +5,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.Random;
 
 import it.unimi.dsi.fastutil.ints.Int2ObjectMap;
 import me.pau.mod.locks.Locks;
@@ -21,11 +22,11 @@ import me.pau.mod.locks.common.item.LockingItem;
 import me.pau.mod.locks.common.util.Lockable;
 import me.pau.mod.locks.common.util.LocksPredicates;
 import me.pau.mod.locks.common.util.LocksUtil;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.npc.VillagerProfession;
 import net.minecraft.world.entity.npc.VillagerTrades;
-import net.minecraft.world.entity.npc.VillagerTrades.*;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -35,6 +36,9 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.core.BlockPos;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.trading.MerchantOffer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.chunk.LevelChunk;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
@@ -50,6 +54,7 @@ import net.minecraftforge.event.level.ChunkEvent;
 import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import org.jetbrains.annotations.NotNull;
 
 @Mod.EventBusSubscriber(modid = Locks.ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public final class LocksForgeEvents {
@@ -70,6 +75,14 @@ public final class LocksForgeEvents {
 	@SubscribeEvent
 	public static void attachCapabilitiesToEntity(AttachCapabilitiesEvent<Entity> e) {
 		LocksCapabilities.attachToEntity(e);
+	}
+
+	private static VillagerTrades.ItemListing enchantedOffer(@NotNull ItemStack itemStack, int baseEmeraldCost, int maxUses, int villagerXp, float priceMultiplier, RandomSource p_219692_) {
+		int i = 5 + p_219692_.nextInt(15);
+		ItemStack itemstack = EnchantmentHelper.enchantItem(p_219692_, itemStack, i, false);
+		int j = Math.min(baseEmeraldCost + i, 64);
+		ItemStack itemstack1 = new ItemStack(Items.EMERALD, j);
+		return ((trader, rand) -> new MerchantOffer(itemstack1, itemstack, maxUses, villagerXp, priceMultiplier));
 	}
 
 	/*
@@ -103,30 +116,53 @@ public final class LocksForgeEvents {
 		Int2ObjectMap<List<VillagerTrades.ItemListing>> levels = e.getTrades();
 
 		List<VillagerTrades.ItemListing> trades = levels.get(1);
-		trades.add(new VillagerTrades.ItemsForEmeralds((new ItemStack(LocksItems.WOOD_LOCK_PICK.get())), 1, 2, 16, 2, 0.05f));
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.WOOD_LOCK_MECHANISM.get()), 2, 1, 12, 1, 0.2f));
+		//trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.WOOD_LOCK_PICK.get()), 1, 2, 16, 2, 0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 1),
+				new ItemStack(LocksItems.WOOD_LOCK_PICK.get(), 2),16,2,0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 2),
+				new ItemStack(LocksItems.WOOD_LOCK_MECHANISM.get(), 1),12,1,0.02f));
 		trades = levels.get(2);
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.IRON_LOCK_PICK.get()), 2, 2, 16, 5, 0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 2),
+				new ItemStack(LocksItems.IRON_LOCK_PICK.get(), 2),16,5,0.05f));
 		trades = levels.get(3);
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.GOLD_LOCK_PICK.get()), 6, 2, 12, 20, 0.05f));
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.IRON_LOCK_MECHANISM.get()), 5, 1, 8, 10, 0.2f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 6),
+				new ItemStack(LocksItems.GOLD_LOCK_PICK.get(), 2),12,20,0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 5),
+				new ItemStack(LocksItems.IRON_LOCK_MECHANISM.get(), 1),8,10,0.02f));
 		trades = levels.get(4);
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.STEEL_LOCK_PICK.get()), 4, 2, 16, 20, 0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 4),
+				new ItemStack(LocksItems.STEEL_LOCK_PICK.get(), 2),16,20,0.05f));
 		trades = levels.get(5);
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.DIAMOND_LOCK_PICK.get()), 8, 2, 12, 30, 0.05f));
-		trades.add(new VillagerTrades.ItemsForEmeralds(new ItemStack(LocksItems.STEEL_LOCK_MECHANISM.get()), 8, 1, 8, 30, 0.2f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 8),
+				new ItemStack(LocksItems.DIAMOND_LOCK_PICK.get(), 2),12,30,0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 8),
+				new ItemStack(LocksItems.STEEL_LOCK_MECHANISM.get(), 1),8,30,0.02f));
 	}
 
 	@SubscribeEvent
 	public static void addWandererTrades(WandererTradesEvent e) {
 		List<VillagerTrades.ItemListing> trades;
 		trades = e.getGenericTrades();
-		trades.add(new VillagerTrades.ItemsForEmeralds(LocksItems.GOLD_LOCK_PICK.get(), 5, 2, 6, 1));
-		trades.add(new VillagerTrades.ItemsForEmeralds(LocksItems.STEEL_LOCK_PICK.get(), 3, 2, 8, 1));
-		trades.add(new VillagerTrades.EnchantedItemForEmeralds(LocksItems.STEEL_LOCK.get(), 16, 4, 1));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 5),
+				new ItemStack(LocksItems.GOLD_LOCK_PICK.get(), 2),6,1,0.05f));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 3),
+				new ItemStack(LocksItems.STEEL_LOCK_PICK.get(), 2),8,1,0.05f));
+		trades.add(enchantedOffer(new ItemStack(LocksItems.STEEL_LOCK.get()), 16, 4, 1, 0.5f, RandomSource.create()));
 		trades = e.getRareTrades();
-		trades.add(new VillagerTrades.ItemsForEmeralds(LocksItems.STEEL_LOCK_MECHANISM.get(), 6, 1, 4, 1));
-		trades.add(new VillagerTrades.EnchantedItemForEmeralds(LocksItems.DIAMOND_LOCK.get(), 28, 4, 1));
+		trades.add((trader, rand) -> new MerchantOffer(
+				new ItemStack(Items.EMERALD, 6),
+				new ItemStack(LocksItems.STEEL_LOCK_MECHANISM.get(), 1),4,1,0.05f));
+		trades.add(enchantedOffer(new ItemStack(LocksItems.DIAMOND_LOCK.get()), 28, 4, 1, 0.5f, RandomSource.create()));
 	}
 
 	@SubscribeEvent

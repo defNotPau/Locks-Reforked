@@ -136,15 +136,21 @@ public class LockPickingScreen extends AbstractContainerScreen<LockPickingContai
 			if(a != this.length - 1)
 				INNER_WALL_TEX.draw(mtx, FRONT_WALL_TEX.width + COLUMN_TEX.width + a * (COLUMN_TEX.width + INNER_WALL_TEX.width), 0f, 1f);
 		}
+
 		BACK_WALL_TEX.draw(mtx, this.length * (COLUMN_TEX.width + INNER_WALL_TEX.width), 0f, 1f);
 		HANDLE_TEX.draw(mtx, BACK_WALL_TEX.width + this.length * (COLUMN_TEX.width + INNER_WALL_TEX.width), 2f, 1f);
+
 		// FIXME right way??
 		RenderSystem.enableBlend();
 		RenderSystem.blendFuncSeparate(GlStateManager.SourceFactor.SRC_ALPHA, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA, GlStateManager.SourceFactor.ONE, GlStateManager.DestFactor.ONE_MINUS_SRC_ALPHA);
-		for(Sprite sprite : this.sprites) {
-			if(sprite == this.lockPick)
-				this.minecraft.getTextureManager().bind(this.pickTex); // FIXME fucking terrible
-			sprite.draw(mtx, pt);
+
+		for (Sprite sprite : this.sprites) {
+			//if (sprite == this.lockPick) this.minecraft.getTextureManager().bindForSetup(this.pickTex); // FIXME fucking terrible
+			if (sprite == this.lockPick || sprite == this.rightPickPart || sprite == this.leftPickPart){
+				sprite.draw(mtx, pt, this.pickTex);
+			} else {
+				sprite.draw(mtx, pt, this.lockTex);
+			}
 		}
 		mtx.popPose();
 	}

@@ -1,32 +1,23 @@
 package me.pau.mod.locks.client.util;
 
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
+import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.culling.Frustum;
-import org.lwjgl.opengl.GL11;
+import net.minecraft.world.entity.player.Player;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.systems.RenderSystem;
+import org.joml.Math;
 
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.ActiveRenderInfo;
-import net.minecraft.client.renderer.BufferBuilder;
-import net.minecraft.client.renderer.Tessellator;
-import net.minecraft.client.renderer.WorldVertexBufferUploader;
-import net.minecraft.client.renderer.LevelRenderer;
-import net.minecraft.client.renderer.vertex.DefaultVertexFormats;
-import net.minecraft.entity.player.PlayerEntity;
-import net.minecraft.util.math.MathHelper;
-import net.minecraft.util.math.vector.Quaternion;
 import net.minecraft.world.phys.Vec3;
-import net.minecraft.util.math.vector.Vector3f;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public final class LocksClientUtil
-{
+public final class LocksClientUtil {
 	private LocksClientUtil() {}
 
 	public static Camera getCamera()
@@ -34,8 +25,7 @@ public final class LocksClientUtil
 		return Minecraft.getInstance().gameRenderer.getMainCamera();
 	}
 
-	public static Frustum getClippingHelper(PoseStack mtx, Matrix4f proj)
-	{
+	public static Frustum getFrustum(PoseStack mtx, Matrix4f proj) {
 		Frustum ch = Minecraft.getInstance().levelRenderer.getFrustum();
 		if(ch != null)
 			return ch;
@@ -45,8 +35,7 @@ public final class LocksClientUtil
 		return ch;
 	}
 
-	public static double distanceToLineSq(Vec3 p, Vec3 l1, Vec3 l2)
-	{
+	public static double distanceToLineSq(Vec3 p, Vec3 l1, Vec3 l2) {
 		Vec3 l = l2.subtract(l1);
 		return l.cross(p.subtract(l1)).lengthSqr() / l.lengthSqr();
 	}
@@ -74,10 +63,9 @@ public final class LocksClientUtil
 
 	// https://forums.minecraftforge.net/topic/88562-116solved-3d-to-2d-conversion/
 	// And big thanks to JTK222 Lukas!!!
-	public static Vector3f worldToScreen(Vec3 pos, float partialTicks)
-	{
+	public static Vector3f worldToScreen(Vec3 pos, float partialTicks) {
 		Minecraft mc = Minecraft.getInstance();
-		ActiveRenderInfo cam = getCamera();
+		Camera cam = getCamera();
 		Vec3 o = cam.getPosition();
 
 		Vector3f pos1 = new Vector3f((float) (o.x - pos.x), (float) (o.y - pos.y), (float) (o.z - pos.z));
@@ -86,20 +74,19 @@ public final class LocksClientUtil
 		pos1.transform(rot);
 
 		// Account for view bobbing
-		if (mc.options.bobView && mc.getCameraEntity() instanceof PlayerEntity)
-		{
-			PlayerEntity player = (PlayerEntity) mc.getCameraEntity();
+		if (mc.options.bobView().get() && mc.getCameraEntity() instanceof Player) {
+			Player player = (Player) mc.getCameraEntity();
 			float f = player.walkDist - player.walkDistO;
 			float f1 = -(player.walkDist + f * partialTicks);
-			float f2 = MathHelper.lerp(partialTicks, player.oBob, player.bob);
+			float f2 = Math.lerp(partialTicks, player.oBob, player.bob);
 
-			Quaternion rot1 = Vector3f.XP.rotationDegrees(Math.abs(MathHelper.cos(f1 * (float) Math.PI - 0.2f) * f2) * 5f);
-			Quaternion rot2 = Vector3f.ZP.rotationDegrees(MathHelper.sin(f1 * (float) Math.PI) * f2 * 3f);
+			Quaternion rot1 = Vector3f.XP.rotationDegrees(Math.abs(Math.cos(f1 * (float) Math.PI - 0.2f) * f2) * 5f);
+			Quaternion rot2 = Vector3f.ZP.rotationDegrees(Math.sin(f1 * (float) Math.PI) * f2 * 3f);
 			rot1.conj();
 			rot2.conj();
 			pos1.transform(rot1);
 			pos1.transform(rot2);
-			pos1.add(MathHelper.sin(f1 * (float) Math.PI) * f2 * 0.5f, Math.abs(MathHelper.cos(f1 * (float) Math.PI) * f2), 0f);
+			pos1.add(Math.sin(f1 * (float) Math.PI) * f2 * 0.5f, Math.abs(Math.cos(f1 * (float) Math.PI) * f2), 0f);
 		}
 
 		Window w = mc.getWindow();
@@ -123,32 +110,28 @@ public final class LocksClientUtil
 	}
 	*/
 
-	public static void texture(PoseStack mtx, float x, float y, int u, int v, int width, int height, int texWidth, int texHeight, float alpha) // FIXME Cant batch like the others? Why? ;-;
-	{
+	public static void texture(PoseStack mtx, float x, float y, int u, int v, int width, int height, int texWidth, int texHeight, float alpha) { // FIXME Cant batch like the others? Why? ;-;
 		Matrix4f last = mtx.last().pose();
 		float f = 1f / texWidth;
 		float f1 = 1f / texHeight;
 
-		BufferBuilder buf = Tessellator.getInstance().getBuilder();
-		buf.begin(GL11.GL_QUADS, DefaultVertexFormats.POSITION_TEX_COLOR);
+		BufferBuilder buf = Tesselator.getInstance().getBuilder();
+		buf.begin(VertexFormat.Mode.QUADS, DefaultVertexFormat.POSITION_TEX_COLOR);
 		buf.vertex(last, x, y + height, 0f).uv(u * f, (v + height) * f1).color(1f, 1f, 1f, alpha).endVertex();
 		buf.vertex(last, x + width, y + height, 0f).uv((u + width) * f, (v + height) * f1).color(1f, 1f, 1f, alpha).endVertex();
 		buf.vertex(last, x + width, y, 0f).uv((u + width) * f,  v * f1).color(1f, 1f, 1f, alpha).endVertex();
 		buf.vertex(last, x, y, 0f).uv(u * f, v * f1).color(1f, 1f, 1f, alpha).endVertex();
 		buf.end();
-		RenderSystem.enableAlphaTest();
-		WorldVertexBufferUploader.end(buf);
 	}
 
 	// https://stackoverflow.com/questions/7854043/drawing-rectangle-between-two-points-with-arbitrary-width
-	public static void line(BufferBuilder buf, PoseStack mtx, float x1, float y1, float x2, float y2, float width, float r, float g, float b, float a)
-	{
+	public static void line(BufferBuilder buf, PoseStack mtx, float x1, float y1, float x2, float y2, float width, float r, float g, float b, float a) {
 		Matrix4f last = mtx.last().pose();
 		// Construct perpendicular
 		float pX = y2 - y1;
 		float pY = x1 - x2;
 		// Normalize and scale by half width
-		float pL = MathHelper.sqrt(pX * pX + pY * pY);
+		float pL = Math.sqrt(pX * pX + pY * pY);
 		pX *= width / 2f / pL;
 		pY *= width / 2f / pL;
 
@@ -158,8 +141,7 @@ public final class LocksClientUtil
 		buf.vertex(last, x2 + pX, y2 + pY, 0f).color(r, g, b, a).endVertex();
 	}
 
-	public static void square(BufferBuilder buf, PoseStack mtx, float x, float y, float length, float r, float g, float b, float a)
-	{
+	public static void square(BufferBuilder buf, PoseStack mtx, float x, float y, float length, float r, float g, float b, float a) {
 		Matrix4f last = mtx.last().pose();
 		length /= 2f;
 		buf.vertex(last, x - length, y - length, 0f).color(r, g, b, a).endVertex();
@@ -168,8 +150,7 @@ public final class LocksClientUtil
 		buf.vertex(last, x + length, y - length, 0f).color(r, g, b, a).endVertex();
 	}
 
-	public static void vGradient(BufferBuilder bld, PoseStack mtx, int x1, int y1, int x2, int y2, float r1, float g1, float b1, float a1, float r2, float g2, float b2, float a2)
-	{
+	public static void vGradient(BufferBuilder bld, PoseStack mtx, int x1, int y1, int x2, int y2, float r1, float g1, float b1, float a1, float r2, float g2, float b2, float a2) {
 		Matrix4f last = mtx.last().pose();
 		bld.vertex(last, x2, y1, 0f).color(r1, g1, b1, a1).endVertex();
 		bld.vertex(last, x1, y1, 0f).color(r1, g1, b1, a1).endVertex();
@@ -195,8 +176,7 @@ public final class LocksClientUtil
 	 * https://www.gamedev.net/forums/topic/572263-bezier-curve-for-animation/
 	 * https://math.stackexchange.com/questions/2571471/understanding-of-cubic-b%C3%A9zier-curves-in-one-dimension
 	 */
-	public static float cubicBezier1d(float anchor1, float anchor2, float progress)
-	{
+	public static float cubicBezier1d(float anchor1, float anchor2, float progress) {
 		float omp = 1f - progress;
 		return 3f * omp * omp * progress * anchor1 + 3f * omp * progress * progress * anchor2 + progress * progress * progress;
 	}
