@@ -31,6 +31,7 @@ import net.minecraft.util.Mth;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.minecraftforge.registries.ForgeRegistries;
 
 @OnlyIn(Dist.CLIENT)
 public class LockPickingScreen extends AbstractContainerScreen<LockPickingContainer> {
@@ -94,12 +95,12 @@ public class LockPickingScreen extends AbstractContainerScreen<LockPickingContai
 		}
 		this.lockPick = this.addSprite(new Sprite(LOCK_PICK_TEX).position(0f, -4 + COLUMN_TEX.height - LOCK_PICK_TEX.height));
 		this.resetPick();
-		this.rightPickPart = this.addSprite(new Sprite(new TextureInfo(0, 0, 0, 12, 160, 16, this.pickTex)).position(-10f, this.lockPick.posY).alpha(0f));
-		this.leftPickPart = this.addSprite(new Sprite(new TextureInfo(0, 0, 0, 12, 160, 16, this.pickTex)).position(0f, this.lockPick.posY).rotation(-24.5f, -10f, this.lockPick.posY + 13f).alpha(0f));
+		this.rightPickPart = this.addSprite(new Sprite(new TextureInfo(0, 0, 0, 12, 160, 16)).position(-10f, this.lockPick.posY).alpha(0f));
+		this.leftPickPart = this.addSprite(new Sprite(new TextureInfo(0, 0, 0, 12, 160, 16)).position(0f, this.lockPick.posY).rotation(-24.5f, -10f, this.lockPick.posY + 13f).alpha(0f));
 	}
 
 	public static ResourceLocation getTextureFor(ItemStack stack) {
-		return new ResourceLocation(Locks.ID, "textures/gui/" + stack.getItem()..getPath() + ".png");
+		return new ResourceLocation(Locks.ID, "textures/gui/" + ForgeRegistries.ITEMS.getKey(stack.getItem()).getPath() + ".png");
 	}
 
 	public Sprite addSprite(Sprite sprite) {
@@ -147,9 +148,9 @@ public class LockPickingScreen extends AbstractContainerScreen<LockPickingContai
 		for (Sprite sprite : this.sprites) {
 			//if (sprite == this.lockPick) this.minecraft.getTextureManager().bindForSetup(this.pickTex); // FIXME fucking terrible
 			if (sprite == this.lockPick || sprite == this.rightPickPart || sprite == this.leftPickPart){
-				sprite.draw(mtx, pt, this.pickTex);
+				sprite.draw(mtx, pt);
 			} else {
-				sprite.draw(mtx, pt, this.lockTex);
+				sprite.draw(mtx, pt);
 			}
 		}
 		mtx.popPose();

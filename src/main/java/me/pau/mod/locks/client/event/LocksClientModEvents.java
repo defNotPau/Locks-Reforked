@@ -9,13 +9,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 
 @Mod.EventBusSubscriber(modid = Locks.ID, value = Dist.CLIENT, bus = Mod.EventBusSubscriber.Bus.MOD)
-public final class LocksClientModEvents
-{
+public final class LocksClientModEvents {
 	private LocksClientModEvents() {}
 
 	@SubscribeEvent
-	public static void onSetup(FMLClientSetupEvent e)
-	{
+	public static void onSetup(FMLClientSetupEvent e) {
 		LocksScreens.register();
 		LocksItemModelsProperties.register();
 	}

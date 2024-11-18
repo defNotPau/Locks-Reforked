@@ -5,12 +5,10 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public abstract class TimedAction<S extends Sprite> extends SingleCallbackAction<S>
-{
+public abstract class TimedAction<S extends Sprite> extends SingleCallbackAction<S> {
 	public int ticks;
 
-	public TimedAction<S> time(int ticks)
-	{
+	public TimedAction<S> time(int ticks) {
 		this.ticks = ticks;
 		return this;
 	}

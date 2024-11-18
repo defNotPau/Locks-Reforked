@@ -7,8 +7,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 
 @OnlyIn(Dist.CLIENT)
-public interface IAction<S extends Sprite>
-{
+public interface IAction<S extends Sprite> {
 	boolean isFinished(S sprite);
 
 	void update(S sprite);

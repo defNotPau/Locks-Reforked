@@ -3,39 +3,34 @@ package me.pau.mod.locks.client.init;
 import me.pau.mod.locks.Locks;
 import me.pau.mod.locks.common.init.LocksItems;
 import me.pau.mod.locks.common.item.LockItem;
-import net.minecraft.item.IItemPropertyGetter;
-import net.minecraft.item.ItemModelsProperties;
-import net.minecraft.util.ResourceLocation;
+import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.client.renderer.item.ItemPropertyFunction;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.minecraftforge.items.CapabilityItemHandler;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 @OnlyIn(Dist.CLIENT)
-public final class LocksItemModelsProperties
-{
+public final class LocksItemModelsProperties {
 	private LocksItemModelsProperties() {}
 
-	public static void register()
-	{
-		ItemModelsProperties.register(LocksItems.KEY_RING.get(), new ResourceLocation(Locks.ID, "keys"), (stack, world, entity) ->
-		{
-			return stack.getCapability(CapabilityItemHandler.ITEM_HANDLER_CAPABILITY)
-				.map(inv ->
-				{
-					int keys = 0;
-					for(int a = 0; a < inv.getSlots(); ++a)
-						if(!inv.getStackInSlot(a).isEmpty())
-							++keys;
-					return (float) keys / inv.getSlots();
-				})
-				.orElse(0f);
-		});
+	public static void register() {
+		ItemProperties.register(LocksItems.KEY_RING.get(), new ResourceLocation(Locks.ID, "keys"), (stack, world, entity, speed) ->
+                stack.getCapability(ForgeCapabilities.ITEM_HANDLER)
+                    .map(inv -> {
+                        int keys = 0;
+                        for(int a = 0; a < inv.getSlots(); ++a)
+                            if(!inv.getStackInSlot(a).isEmpty())
+                                ++keys;
+                        return (float) keys / inv.getSlots();
+                    })
+                    .orElse(0f));
 		ResourceLocation id = new ResourceLocation(Locks.ID, "open");
-		IItemPropertyGetter getter = (stack, world, entity) -> LockItem.isOpen(stack) ? 1f : 0f;
-		ItemModelsProperties.register(LocksItems.WOOD_LOCK.get(), id, getter);
-		ItemModelsProperties.register(LocksItems.IRON_LOCK.get(), id, getter);
-		ItemModelsProperties.register(LocksItems.STEEL_LOCK.get(), id, getter);
-		ItemModelsProperties.register(LocksItems.GOLD_LOCK.get(), id, getter);
-		ItemModelsProperties.register(LocksItems.DIAMOND_LOCK.get(), id, getter);
+		ItemPropertyFunction getter = (stack, world, entity, speed) -> LockItem.isOpen(stack) ? 1f : 0f;
+		ItemProperties.register(LocksItems.WOOD_LOCK.get(), id, getter);
+		ItemProperties.register(LocksItems.IRON_LOCK.get(), id, getter);
+		ItemProperties.register(LocksItems.STEEL_LOCK.get(), id, getter);
+		ItemProperties.register(LocksItems.GOLD_LOCK.get(), id, getter);
+		ItemProperties.register(LocksItems.DIAMOND_LOCK.get(), id, getter);
 	}
 }

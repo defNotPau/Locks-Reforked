@@ -4,6 +4,8 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.math.Matrix4f;
 import com.mojang.math.Quaternion;
 import com.mojang.math.Vector3f;
+import me.pau.mod.locks.mixin.GameRendererAccessor;
+import me.pau.mod.locks.mixin.LevelRendererAccessor;
 import net.minecraft.client.Camera;
 import net.minecraft.client.renderer.culling.Frustum;
 import net.minecraft.world.entity.player.Player;
@@ -26,7 +28,7 @@ public final class LocksClientUtil {
 	}
 
 	public static Frustum getFrustum(PoseStack mtx, Matrix4f proj) {
-		Frustum ch = Minecraft.getInstance().levelRenderer.getFrustum();
+		Frustum ch = ((LevelRendererAccessor) Minecraft.getInstance().levelRenderer).getCullingFrustum();
 		if(ch != null)
 			return ch;
 		ch = new Frustum(mtx.last().pose(), proj);
@@ -90,7 +92,9 @@ public final class LocksClientUtil {
 		}
 
 		Window w = mc.getWindow();
-		float sc = w.getGuiScaledHeight() / 2f / pos1.z() / (float) Math.tan(Math.toRadians(mc.gameRenderer.getFov(cam, partialTicks, true) / 2f));
+		GameRendererAccessor gr = (GameRendererAccessor) mc.gameRenderer;
+
+		float sc = w.getGuiScaledHeight() / 2f / pos1.z() / (float) Math.tan(Math.toRadians(((gr.getFov(cam, partialTicks, true)) / 2f)));
 		pos1.mul(-sc, -sc, 1f);
 		pos1.add(w.getGuiScaledWidth() / 2f, w.getGuiScaledHeight() / 2f, 0f);
 

@@ -5,12 +5,11 @@ import java.util.regex.Pattern;
 
 import com.google.common.collect.Lists;
 
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public class LocksServerConfig
-{
+public class LocksServerConfig {
 	public static final ForgeConfigSpec SPEC;
 
 	public static final ForgeConfigSpec.IntValue MAX_LOCKABLE_VOLUME;
@@ -21,8 +20,7 @@ public class LocksServerConfig
 
 	public static Pattern[] lockableBlocks;
 
-	static
-	{
+	static {
 		ForgeConfigSpec.Builder cfg = new ForgeConfigSpec.Builder();
 
 		MAX_LOCKABLE_VOLUME = cfg
@@ -46,14 +44,12 @@ public class LocksServerConfig
 
 	private LocksServerConfig() {}
 
-	public static void init()
-	{
+	public static void init() {
 		lockableBlocks = LOCKABLE_BLOCKS.get().stream().map(s -> Pattern.compile(s)).toArray(Pattern[]::new);
 	}
 
-	public static boolean canLock(World world, BlockPos pos)
-	{
-		String name = world.getBlockState(pos).getBlock().getRegistryName().toString();
+	public static boolean canLock(Level world, BlockPos pos) {
+		String name = world.getBlockState(pos).getBlock().getName().toString();
 		for(Pattern p : lockableBlocks)
 			if(p.matcher(name).matches())
 				return true;

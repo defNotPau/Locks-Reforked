@@ -2,9 +2,11 @@ package me.pau.mod.locks.client.event;
 
 import java.util.List;
 
+import me.pau.mod.locks.common.config.LocksClientConfig;
+
 import com.mojang.blaze3d.vertex.*;
-import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.math.Quaternion;
+import com.mojang.math.Vector3f;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.LevelRenderer;
@@ -14,8 +16,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.block.state.properties.AttachFace;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import org.lwjgl.opengl.GL11;
 
 import com.google.common.collect.Lists;
 import com.mojang.blaze3d.systems.RenderSystem;
@@ -33,10 +35,8 @@ import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.InteractionHand;
-import net.minecraft.util.math.BlockRayTraceResult;
 import net.minecraft.util.Mth;
 import com.mojang.math.Matrix4f;
-import org.joml.Vector3f;
 import net.minecraft.network.chat.Component;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderGuiOverlayEvent;
@@ -146,7 +146,7 @@ public final class LocksClientForgeEvents {
 		BlockPos pos = select.get();
 		if(pos == null)
 			return;
-		BlockPos pos1 = mc.hitResult instanceof BlockRayTraceResult ? ((BlockRayTraceResult) mc.hitResult).getBlockPos() : pos;
+		BlockPos pos1 = mc.hitResult instanceof BlockHitResult ? ((BlockHitResult) mc.hitResult).getBlockPos() : pos;
 		boolean allow = Math.abs(pos.getX() - pos1.getX()) * Math.abs(pos.getY() - pos1.getY()) * Math.abs(pos.getZ() - pos1.getZ()) <= LocksServerConfig.MAX_LOCKABLE_VOLUME.get() && LocksServerConfig.canLock(mc.level, pos1);
 		// Same as above
 		LevelRenderer.renderLineBox(mtx, buf.getBuffer(LocksRenderTypes.OVERLAY_LINES), Math.min(pos.getX(), pos1.getX()) - o.x, Math.min(pos.getY(), pos1.getY()) - o.y, Math.min(pos.getZ(), pos1.getZ()) - o.z, Math.max(pos.getX(), pos1.getX()) + 1d - o.x, Math.max(pos.getY(), pos1.getY()) + 1d - o.y, Math.max(pos.getZ(), pos1.getZ()) + 1d - o.z, allow ? 0f : 1f, allow ? 1f : 0f, 0f, 0.5f);
