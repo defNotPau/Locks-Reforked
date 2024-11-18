@@ -12,7 +12,6 @@ import me.pau.mod.locks.common.init.LocksContainerTypes;
 import me.pau.mod.locks.common.init.LocksEnchantments;
 import me.pau.mod.locks.common.init.LocksFeatures;
 import me.pau.mod.locks.common.init.LocksItems;
-import me.pau.mod.locks.common.init.LocksPlacements;
 import me.pau.mod.locks.common.init.LocksRecipeSerializers;
 import me.pau.mod.locks.common.init.LocksSoundEvents;
 import net.minecraftforge.fml.common.Mod;
@@ -37,7 +36,6 @@ public final class Locks {
 		LocksItems.register(modEventBus);
 		LocksEnchantments.register(modEventBus);
 		LocksSoundEvents.register(modEventBus);
-		LocksPlacements.register(modEventBus);
 		LocksFeatures.register(modEventBus);
 		LocksContainerTypes.register(modEventBus);
 		LocksRecipeSerializers.register(modEventBus);

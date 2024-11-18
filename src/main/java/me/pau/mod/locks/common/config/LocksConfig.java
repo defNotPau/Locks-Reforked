@@ -15,8 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.ForgeConfigSpec;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public final class LocksConfig
-{
+public final class LocksConfig {
 	public static final ForgeConfigSpec SPEC;
 
 	public static final ForgeConfigSpec.DoubleValue GENERATION_CHANCE;
@@ -28,8 +27,7 @@ public final class LocksConfig
 	public static NavigableMap<Integer, Item> weightedGeneratedLocks;
 	public static int weightTotal;
 
-	static
-	{
+	static {
 		ForgeConfigSpec.Builder cfg = new ForgeConfigSpec.Builder();
 
 		GENERATION_CHANCE = cfg
@@ -54,14 +52,12 @@ public final class LocksConfig
 	private LocksConfig() {}
 
 	// https://gist.github.com/raws/1667807
-	public static void init()
-	{
+	public static void init() {
 		weightedGeneratedLocks = new TreeMap<>();
 		weightTotal = 0;
 		List<? extends String> locks = GENERATED_LOCKS.get();
 		List<? extends Integer> weights = GENERATED_LOCK_WEIGHTS.get();
-		for(int a = 0; a < locks.size(); ++a)
-		{
+		for(int a = 0; a < locks.size(); ++a) {
 			weightTotal += weights.get(a);
 			weightedGeneratedLocks.put(weightTotal, ForgeRegistries.ITEMS.getValue(new ResourceLocation(locks.get(a))));
 		}
@@ -77,8 +73,7 @@ public final class LocksConfig
 		return LocksUtil.chance(rng, GENERATION_ENCHANT_CHANCE.get());
 	}
 
-	public static ItemStack getRandomLock(RandomSource rng)
-	{
+	public static ItemStack getRandomLock(RandomSource rng) {
 		ItemStack stack = new ItemStack(weightedGeneratedLocks.ceilingEntry(rng.nextInt(weightTotal) + 1).getValue());
 		return canEnchant(rng) ? EnchantmentHelper.enchantItem(rng, stack, 5 + rng.nextInt(30), false) : stack;
 	}

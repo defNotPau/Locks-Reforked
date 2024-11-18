@@ -5,8 +5,7 @@ import me.pau.mod.locks.common.util.Lockable;
 import net.minecraft.nbt.ListTag;
 import net.minecraftforge.common.util.INBTSerializable;
 
-public interface ILockableStorage extends INBTSerializable<ListTag>
-{
+public interface ILockableStorage extends INBTSerializable<ListTag> {
 	Int2ObjectMap<Lockable> get();
 
 	void add(Lockable lkb);

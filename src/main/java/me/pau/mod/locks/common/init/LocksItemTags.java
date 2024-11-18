@@ -6,8 +6,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.tags.TagKey;
 import net.minecraft.tags.ItemTags;
 
-public final class LocksItemTags
-{
+public final class LocksItemTags {
 	private LocksItemTags() {}
 
 	public static final TagKey<Item>

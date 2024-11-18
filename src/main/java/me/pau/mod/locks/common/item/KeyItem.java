@@ -6,11 +6,11 @@ import java.util.stream.Collectors;
 import me.pau.mod.locks.common.init.LocksSoundEvents;
 import me.pau.mod.locks.common.util.Lockable;
 import me.pau.mod.locks.common.util.LocksUtil;
-import net.minecraft.item.ItemUseContext;
-import net.minecraft.util.ActionResultType;
-import net.minecraft.util.SoundCategory;
-import net.minecraft.util.math.BlockPos;
-import net.minecraft.world.World;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 
 public class KeyItem extends LockingItem
 {
@@ -21,19 +21,18 @@ public class KeyItem extends LockingItem
 
 	// TODO Sound pitch
 	@Override
-	public ActionResultType useOn(ItemUseContext ctx)
-	{
-		World world = ctx.getLevel();
+	public InteractionResult useOn(UseOnContext ctx) {
+		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
 		int id = getOrSetId(ctx.getItemInHand());
 		List<Lockable> match = LocksUtil.intersecting(world, pos).filter(lkb -> lkb.lock.id == id).collect(Collectors.toList());
 		if(match.isEmpty())
-			return ActionResultType.PASS;
-		world.playSound(ctx.getPlayer(), pos, LocksSoundEvents.LOCK_OPEN.get(), SoundCategory.BLOCKS, 1f, 1f);
+			return InteractionResult.PASS;
+		world.playSound(ctx.getPlayer(), pos, LocksSoundEvents.LOCK_OPEN.get(), SoundSource.BLOCKS, 1f, 1f);
 		if(world.isClientSide)
-			return ActionResultType.SUCCESS;
+			return InteractionResult.SUCCESS;
 		for(Lockable lkb : match)
 			lkb.lock.setLocked(!lkb.lock.isLocked());
-		return ActionResultType.SUCCESS;
+		return InteractionResult.SUCCESS;
 	}
 }

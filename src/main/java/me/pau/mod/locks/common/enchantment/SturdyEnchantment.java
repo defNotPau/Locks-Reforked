@@ -1,14 +1,14 @@
 package me.pau.mod.locks.common.enchantment;
 
 import me.pau.mod.locks.common.init.LocksEnchantments;
-import net.minecraft.enchantment.Enchantment;
-import net.minecraft.inventory.EquipmentSlotType;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.enchantment.Enchantment;
 
 public class SturdyEnchantment extends Enchantment
 {
 	public SturdyEnchantment()
 	{
-		super(Rarity.RARE, LocksEnchantments.LOCK_TYPE, new EquipmentSlotType[] { EquipmentSlotType.MAINHAND });
+		super(Rarity.RARE, LocksEnchantments.LOCK_TYPE, new EquipmentSlot[] { EquipmentSlot.MAINHAND });
 	}
 
 	@Override

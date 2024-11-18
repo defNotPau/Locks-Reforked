@@ -10,8 +10,7 @@ import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 
-public final class LocksContainerTypes
-{
+public final class LocksContainerTypes {
 	public static final DeferredRegister<MenuType<?>> CONTAINER_TYPES = DeferredRegister.create(ForgeRegistries.MENU_TYPES, Locks.ID);
 
 	public static final RegistryObject<MenuType<LockPickingContainer>>
@@ -24,8 +23,7 @@ public final class LocksContainerTypes
 
 	public static void register(IEventBus eventBus) { CONTAINER_TYPES.register(eventBus); }
 
-	public static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> add(String name, MenuType<T> type)
-	{
+	public static <T extends AbstractContainerMenu> RegistryObject<MenuType<T>> add(String name, MenuType<T> type) {
 		return CONTAINER_TYPES.register(name, () -> type);
 	}
 }

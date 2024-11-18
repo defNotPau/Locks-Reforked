@@ -2,8 +2,7 @@ package me.pau.mod.locks.common.config;
 
 import net.minecraftforge.common.ForgeConfigSpec;
 
-public final class LocksClientConfig
-{
+public final class LocksClientConfig {
 	public static final ForgeConfigSpec SPEC;
 
 	public static final ForgeConfigSpec.BooleanValue DEAF_MODE;
@@ -11,8 +10,7 @@ public final class LocksClientConfig
 
 	private LocksClientConfig() {}
 
-	static
-	{
+	static {
 		ForgeConfigSpec.Builder cfg = new ForgeConfigSpec.Builder();
 
 		DEAF_MODE = cfg

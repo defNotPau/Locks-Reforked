@@ -34,8 +34,7 @@ public class LockPickItem extends Item {
 
 	public final float strength;
 
-	public LockPickItem(float strength, Properties props)
-	{
+	public LockPickItem(float strength, Properties props) {
 		super(props);
 		this.strength = strength;
 	}
@@ -92,6 +91,6 @@ public class LockPickItem extends Item {
 	@Override
 	public void appendHoverText(@NotNull ItemStack stack, Level world, @NotNull List<Component> lines, @NotNull TooltipFlag flag) {
 		super.appendHoverText(stack, world, lines, flag);
-		lines.add(Component.translatable(Locks.ID + ".tooltip.strength", ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains(KEY_STRENGTH) ? stack.getTag().getFloat(KEY_STRENGTH) : this.strength)).withStyle(ChatFormatting.DARK_GREEN));
+		lines.add(Component.translatable(Locks.ID + ".tooltip.strength", ItemStack.ATTRIBUTE_MODIFIER_FORMAT.format(stack.hasTag() && Objects.requireNonNull(stack.getTag()).contains(KEY_STRENGTH) ? stack.getTag().getFloat(KEY_STRENGTH) : this.strength)).withStyle(ChatFormatting.BLUE));
 	}
 }

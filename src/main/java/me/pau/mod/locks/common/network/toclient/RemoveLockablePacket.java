@@ -7,8 +7,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class RemoveLockablePacket
-{
+public class RemoveLockablePacket {
 	private final int id;
 
 	public RemoveLockablePacket(int id)
@@ -26,14 +25,11 @@ public class RemoveLockablePacket
 		buf.writeInt(pkt.id);
 	}
 
-	public static void handle(RemoveLockablePacket pkt, Supplier<NetworkEvent.Context> ctx)
-	{
+	public static void handle(RemoveLockablePacket pkt, Supplier<NetworkEvent.Context> ctx) {
 		// Use runnable, lambda causes issues with class loading
-		ctx.get().enqueueWork(new Runnable()
-		{
+		ctx.get().enqueueWork(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				Minecraft.getInstance().level.getCapability(LocksCapabilities.LOCKABLE_HANDLER).ifPresent(handler -> handler.remove(pkt.id));
 			}
 		});

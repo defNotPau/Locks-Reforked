@@ -8,14 +8,12 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class UpdateLockablePacket
-{
+public class UpdateLockablePacket {
 	private final int id;
 	// Expandable
 	private final boolean locked;
 
-	public UpdateLockablePacket(int id, boolean locked)
-	{
+	public UpdateLockablePacket(int id, boolean locked) {
 		this.id = id;
 		this.locked = locked;
 	}
@@ -25,25 +23,20 @@ public class UpdateLockablePacket
 		this(lkb.id, lkb.lock.isLocked());
 	}
 
-	public static UpdateLockablePacket decode(FriendlyByteBuf buf)
-	{
+	public static UpdateLockablePacket decode(FriendlyByteBuf buf) {
 		return new UpdateLockablePacket(buf.readInt(), buf.readBoolean());
 	}
 
-	public static void encode(UpdateLockablePacket pkt, FriendlyByteBuf buf)
-	{
+	public static void encode(UpdateLockablePacket pkt, FriendlyByteBuf buf) {
 		buf.writeInt(pkt.id);
 		buf.writeBoolean(pkt.locked);
 	}
 
-	public static void handle(UpdateLockablePacket pkt, Supplier<NetworkEvent.Context> ctx)
-	{
+	public static void handle(UpdateLockablePacket pkt, Supplier<NetworkEvent.Context> ctx) {
 		// Use runnable, lambda causes issues with class loading
-		ctx.get().enqueueWork(new Runnable()
-		{
+		ctx.get().enqueueWork(new Runnable() {
 			@Override
-			public void run()
-			{
+			public void run() {
 				Minecraft.getInstance().level.getCapability(LocksCapabilities.LOCKABLE_HANDLER).ifPresent(handler -> handler.getLoaded().get(pkt.id).lock.setLocked(pkt.locked));
 			}
 		});

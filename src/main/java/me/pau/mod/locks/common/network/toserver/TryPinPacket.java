@@ -9,8 +9,7 @@ import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
 
-public class TryPinPacket
-{
+public class TryPinPacket {
 	private final byte pin;
 
 	public TryPinPacket(byte pin)
