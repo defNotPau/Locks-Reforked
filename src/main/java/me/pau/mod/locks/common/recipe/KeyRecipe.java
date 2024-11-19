@@ -18,10 +18,7 @@ public class KeyRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public RecipeSerializer<?> getSerializer()
-	{
-		return LocksRecipeSerializers.KEY
-	}
+	public RecipeSerializer<?> getSerializer() { return LocksRecipeSerializers.KEY.get(); }
 
 	@Override
 	public boolean matches(CraftingContainer inv, Level world) {
@@ -50,13 +47,11 @@ public class KeyRecipe extends CustomRecipe {
 		ItemStack locking = ItemStack.EMPTY;
 		int blanks = 0;
 
-		for (int a = 0; a < inv.getContainerSize(); ++a)
-		{
+		for (int a = 0; a < inv.getContainerSize(); ++a) {
 			ItemStack stack = inv.getItem(a);
 			if (stack.isEmpty())
 				continue;
-			if (stack.hasTag() && stack.getTag().contains(LockingItem.KEY_ID))
-			{
+			if (stack.hasTag() && stack.getTag().contains(LockingItem.KEY_ID)) {
 				if (!locking.isEmpty())
 					return ItemStack.EMPTY;
 				locking = stack;
@@ -73,12 +68,10 @@ public class KeyRecipe extends CustomRecipe {
 	}
 
 	@Override
-	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv)
-	{
+	public NonNullList<ItemStack> getRemainingItems(CraftingContainer inv) {
 		NonNullList<ItemStack> list = NonNullList.withSize(inv.getContainerSize(), ItemStack.EMPTY);
 
-		for (int a = 0; a < list.size(); ++a)
-		{
+		for (int a = 0; a < list.size(); ++a) {
 			ItemStack stack = inv.getItem(a);
 			if(!stack.hasTag() || !stack.getTag().contains(LockingItem.KEY_ID))
 				continue;

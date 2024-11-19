@@ -63,13 +63,11 @@ public class Cuboid6i {
 		buf.writeInt(bb.z2);
 	}
 
-	public Cuboid6i offset(int x, int y, int z)
-	{
+	public Cuboid6i offset(int x, int y, int z) {
 		return new Cuboid6i(this.x1 + x, this.y1 + y, this.z1 + z, this.x2 + x, this.y2 + y, this.z2 + z);
 	}
 
-	public Cuboid6i intersection(Cuboid6i other)
-	{
+	public Cuboid6i intersection(Cuboid6i other) {
 		return new Cuboid6i(Math.max(this.x1, other.x1), Math.max(this.y1, other.y1), Math.max(this.z1, other.z1), Math.min(this.x2, other.x2), Math.min(this.y2, other.y2), Math.min(this.z2, other.z2));
 	}
 
@@ -93,33 +91,27 @@ public class Cuboid6i {
 		return this.length() * this.height() * this.width();
 	}
 
-	public Vec3 center()
-	{
+	public Vec3 center() {
 		return new Vec3((this.x1 + this.x2) * 0.5d, (this.y1 + this.y2) * 0.5d, (this.z1 + this.z2) * 0.5d);
 	}
 
-	public boolean intersects(int x1, int y1, int z1, int x2, int y2, int z2)
-	{
+	public boolean intersects(int x1, int y1, int z1, int x2, int y2, int z2) {
 		return this.x1 < x2 && this.x2 >x1 && this.y1 < y2 && this.y2 > y1 && this.z1 < z2 && this.z2 > z1;
 	}
 
-	public boolean intersects(Cuboid6i other)
-	{
+	public boolean intersects(Cuboid6i other) {
 		return this.intersects(other.x1, other.y1, other.z1, other.x2, other.y2, other.z2);
 	}
 
-	public boolean intersects(BlockPos pos)
-	{
+	public boolean intersects(BlockPos pos) {
 		return this.intersects(pos.getX(), pos.getY(), pos.getZ(), pos.getX() + 1, pos.getY() + 1, pos.getZ() + 1);
 	}
 
-	public Iterable<BlockPos> getContainedPos()
-	{
+	public Iterable<BlockPos> getContainedPos() {
 		return BlockPos.betweenClosed(this.x1, this.y1, this.z1, this.x2 - 1, this.y2 - 1, this.z2 - 1);
 	}
 
-	public boolean getContainedChunks(BiIntPredicate p)
-	{
+	public boolean getContainedChunks(BiIntPredicate p) {
 		// Get the intersecting chunks and go through the checks
 		// Use bitshift because apparently / 16 behaves differently with certain negative numbers
 		int x1 = this.x1 >> 4;
@@ -140,8 +132,7 @@ public class Cuboid6i {
 		return true;
 	}
 
-	public <T> List<T> containedChunksTo(BiIntFunction<T> f, boolean endEarly)
-	{
+	public <T> List<T> containedChunksTo(BiIntFunction<T> f, boolean endEarly) {
 		// Get the intersecting chunks and go through the checks
 		// Use bitshift because apparently / 16 behaves differently with certain negative numbers
 		int x1 = this.x1 >> 4;

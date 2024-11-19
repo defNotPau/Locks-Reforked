@@ -130,8 +130,8 @@ public final class LocksUtil {
 	}
 
 	// Only merges entries, not conditions and functions
-	public static LootTable mergeEntries(LootTable table, LootTable inject) {
-		for(LootPool injectPool : ((LootTableAccessor) inject.getPools())) {
+	public static LootTable mergeEntries(LootTable table, LootTable inj) {
+		for(LootPool injectPool : (((LootTableAccessor) inj).getPools())) {
 			LootPool pool = table.getPool(injectPool.getName());
 			if(pool == null)
 				table.addPool(injectPool);

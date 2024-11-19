@@ -10,6 +10,6 @@ import net.minecraft.world.level.storage.loot.LootTable;
 
 @Mixin(LootTable.class)
 public interface LootTableAccessor {
-    @Accessor
+    @Accessor("pools")
     List<LootPool> getPools();
 }
