@@ -60,8 +60,7 @@ public class LockPickItem extends Item {
 
 	@Override
 	public @NotNull InteractionResult useOn(UseOnContext ctx) {
-		Player player = ctx.getPlayer();
-		LocalPlayer localPlayer = (LocalPlayer) player;
+		Player localPlayer = ctx.getPlayer();
 
 		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
@@ -82,8 +81,8 @@ public class LockPickItem extends Item {
 		if(world.isClientSide) return InteractionResult.SUCCESS;
 		InteractionHand hand = ctx.getHand();
 
-        assert player != null;
-        NetworkHooks.openScreen((ServerPlayer) player, new LockPickingContainer.Provider(hand, lkb), new LockPickingContainer.Writer(hand, lkb));
+        assert localPlayer != null;
+        NetworkHooks.openScreen((ServerPlayer) localPlayer, new LockPickingContainer.Provider(hand, lkb), new LockPickingContainer.Writer(hand, lkb));
 		return InteractionResult.SUCCESS;
 	}
 

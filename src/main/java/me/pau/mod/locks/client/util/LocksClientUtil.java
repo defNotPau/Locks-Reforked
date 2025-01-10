@@ -7,10 +7,14 @@ import com.mojang.math.Vector3f;
 import me.pau.mod.locks.mixin.GameRendererAccessor;
 import me.pau.mod.locks.mixin.LevelRendererAccessor;
 import net.minecraft.client.Camera;
+import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.culling.Frustum;
+import net.minecraft.util.Mth;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 
-import org.joml.Math;
+import net.minecraft.world.level.material.FogType;
+import java.lang.Math;
 
 import com.mojang.blaze3d.platform.Window;
 import net.minecraft.client.Minecraft;
@@ -62,7 +66,31 @@ public final class LocksClientUtil {
 		});
 	}
 	*/
+	
+	public static double getFov(GameRenderer gr, Camera camera, float partialTicks, boolean useFovSetting) {
+		if (gr.isPanoramicMode()) {
+			return 90.0D;
+		} else {
+			double d0 = 70.0D;
+			if (useFovSetting) {
+				d0 = gr.getMinecraft().options.fov().get().intValue();
+				d0 *= lerp(partialTicks, ((GameRendererAccessor) gr).getVarOldFov(), ((GameRendererAccessor) gr).getVarFov());
+			}
 
+			if (camera.getEntity() instanceof LivingEntity && ((LivingEntity)camera.getEntity()).isDeadOrDying()) {
+				float f = Math.min((float)((LivingEntity)camera.getEntity()).deathTime + partialTicks, 20.0F);
+				d0 /= ((1.0F - 500.0F / (f + 500.0F)) * 2.0F + 1.0F);
+			}
+
+			FogType fogtype = camera.getFluidInCamera();
+			if (fogtype == FogType.LAVA || fogtype == FogType.WATER) {
+				d0 *= lerp(gr.getMinecraft().options.fovEffectScale().get(), 1.0D, 0.85714287F);
+			}
+
+			return net.minecraftforge.client.ForgeHooksClient.getFieldOfView(gr, camera, partialTicks, d0, useFovSetting);
+		}
+	}
+	
 	// https://forums.minecraftforge.net/topic/88562-116solved-3d-to-2d-conversion/
 	// And big thanks to JTK222 Lukas!!!
 	public static Vector3f worldToScreen(Vec3 pos, float partialTicks) {
@@ -80,21 +108,20 @@ public final class LocksClientUtil {
 			Player player = (Player) mc.getCameraEntity();
 			float f = player.walkDist - player.walkDistO;
 			float f1 = -(player.walkDist + f * partialTicks);
-			float f2 = Math.lerp(partialTicks, player.oBob, player.bob);
+			float f2 = lerp(partialTicks, player.oBob, player.bob);
 
-			Quaternion rot1 = Vector3f.XP.rotationDegrees(Math.abs(Math.cos(f1 * (float) Math.PI - 0.2f) * f2) * 5f);
-			Quaternion rot2 = Vector3f.ZP.rotationDegrees(Math.sin(f1 * (float) Math.PI) * f2 * 3f);
+			Quaternion rot1 = Vector3f.XP.rotationDegrees((float) (Math.abs(Math.cos(f1 * (float) Math.PI - 0.2f) * f2) * 5f));
+			Quaternion rot2 = Vector3f.ZP.rotationDegrees((float) (Math.sin(f1 * (float) Math.PI) * f2 * 3f));
 			rot1.conj();
 			rot2.conj();
 			pos1.transform(rot1);
 			pos1.transform(rot2);
-			pos1.add(Math.sin(f1 * (float) Math.PI) * f2 * 0.5f, Math.abs(Math.cos(f1 * (float) Math.PI) * f2), 0f);
+			pos1.add((float) (Math.sin(f1 * (float) Math.PI) * f2 * 0.5f), (float) Math.abs(Math.cos(f1 * (float) Math.PI) * f2), 0f);
 		}
 
 		Window w = mc.getWindow();
-		GameRendererAccessor gr = (GameRendererAccessor) mc.gameRenderer;
-
-		float sc = w.getGuiScaledHeight() / 2f / pos1.z() / (float) Math.tan(Math.toRadians(((gr.getFov(cam, partialTicks, true)) / 2f)));
+		
+		float sc = w.getGuiScaledHeight() / 2f / pos1.z() / (float) Math.tan(Math.toRadians((getFov(mc.gameRenderer, cam, partialTicks, true) / 2f)));
 		pos1.mul(-sc, -sc, 1f);
 		pos1.add(w.getGuiScaledWidth() / 2f, w.getGuiScaledHeight() / 2f, 0f);
 
@@ -135,7 +162,7 @@ public final class LocksClientUtil {
 		float pX = y2 - y1;
 		float pY = x1 - x2;
 		// Normalize and scale by half width
-		float pL = Math.sqrt(pX * pX + pY * pY);
+		float pL = (float) Math.sqrt(pX * pX + pY * pY);
 		pX *= width / 2f / pL;
 		pY *= width / 2f / pL;
 

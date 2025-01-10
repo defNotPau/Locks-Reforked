@@ -1,6 +1,5 @@
 package me.pau.mod.locks.common.worldgen;
 
-
 import com.mojang.serialization.Codec;
 
 import net.minecraft.world.level.levelgen.feature.Feature;

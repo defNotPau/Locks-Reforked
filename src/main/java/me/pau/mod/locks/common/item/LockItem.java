@@ -79,7 +79,8 @@ public class LockItem extends LockingItem {
 	public InteractionResult useOn(UseOnContext ctx) {
 		Level world = ctx.getLevel();
 		BlockPos pos = ctx.getClickedPos();
-		if (!LocksServerConfig.canLock(world, pos) ||  ctx.getLevel().getCapability(LocksCapabilities.LOCKABLE_HANDLER).orElse(null).getInChunk(pos).values().stream().anyMatch(lkb -> lkb.bb.intersects(pos)))
+		if (!LocksServerConfig.canLock(world, pos) ||
+				ctx.getLevel().getCapability(LocksCapabilities.LOCKABLE_HANDLER).orElse(null).getInChunk(pos).values().stream().anyMatch(lkb -> lkb.bb.intersects(pos)))
 			return InteractionResult.PASS;
 		return LocksServerConfig.EASY_LOCK.get() ? this.easyLock(ctx) : this.freeLock(ctx);
 	}

@@ -21,6 +21,7 @@ import me.pau.mod.locks.client.gui.sprite.action.WaitAction;
 import me.pau.mod.locks.common.container.LockPickingContainer;
 import me.pau.mod.locks.common.init.LocksNetwork;
 import me.pau.mod.locks.common.network.toserver.TryPinPacket;
+
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
 import net.minecraft.world.entity.player.Inventory;
@@ -116,12 +117,16 @@ public class LockPickingScreen extends AbstractContainerScreen<LockPickingContai
 
 	@Override
 	public void render(PoseStack mtx, int mouseX, int mouseY, float partialTick) {
+		System.out.println("LockPickingScreen1 - render");
+
 		this.renderBackground(mtx);
 		super.render(mtx, mouseX, mouseY, partialTick);
 	}
 
 	@Override
 	protected void renderBg(PoseStack mtx, float partialTick, int mouseX, int mouseY) {
+		System.out.println("LockPickingScreen1 - renderBg");
+
         assert this.minecraft != null;
         float pt = this.minecraft.getFrameTime(); // idk why, but partialTick looks laggy AF... Use getFrameTime instead!
 		int cornerX = (this.width - this.imageWidth) / 2;
@@ -132,7 +137,7 @@ public class LockPickingScreen extends AbstractContainerScreen<LockPickingContai
 		mtx.scale(2f, 2f, 2f);
 		FRONT_WALL_TEX.draw(mtx, 0f, 0f, 1f);
 
-		for(int a = 0; a < this.length; ++a) {
+		for (int a = 0; a < this.length; ++a) {
 			COLUMN_TEX.draw(mtx, FRONT_WALL_TEX.width + a * (COLUMN_TEX.width + INNER_WALL_TEX.width), 0f, 1f);
 			if(a != this.length - 1)
 				INNER_WALL_TEX.draw(mtx, FRONT_WALL_TEX.width + COLUMN_TEX.width + a * (COLUMN_TEX.width + INNER_WALL_TEX.width), 0f, 1f);
@@ -158,6 +163,7 @@ public class LockPickingScreen extends AbstractContainerScreen<LockPickingContai
 
 	@Override
 	protected void renderLabels(PoseStack mtx, int mouseX, int mouseY) {
+		System.out.println("LockPickingScreen1 - renderLabels");
 		// Without shadow
 		this.font.draw(mtx, this.title, 0f, -this.font.lineHeight, 0xffffff);
 		if(this.getMenu().isOpen())

@@ -7,7 +7,6 @@ import me.pau.mod.locks.common.enchantment.SturdyEnchantment;
 import me.pau.mod.locks.common.item.LockItem;
 import net.minecraft.world.item.enchantment.Enchantment;
 import net.minecraft.world.item.enchantment.EnchantmentCategory;
-import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.RegistryObject;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.minecraftforge.registries.DeferredRegister;
@@ -18,19 +17,13 @@ public final class LocksEnchantments {
 
 	public static final DeferredRegister<Enchantment> ENCHANTMENTS = DeferredRegister.create(ForgeRegistries.ENCHANTMENTS, Locks.ID);
 
-	public static final RegistryObject<Enchantment>
-		SHOCKING = add("shocking", new ShockingEnchantment()),
-		STURDY = add("sturdy", new SturdyEnchantment()),
-		COMPLEXITY = add("complexity", new ComplexityEnchantment());
+	public static final RegistryObject<Enchantment> SHOCKING = ENCHANTMENTS.register("shocking", ShockingEnchantment::new);
+	public static final RegistryObject<Enchantment> STURDY = ENCHANTMENTS.register("sturdy", SturdyEnchantment::new);
+	public static final RegistryObject<Enchantment> COMPLEXITY = ENCHANTMENTS.register("complexity", ComplexityEnchantment::new);
 
 	private LocksEnchantments() {}
 
-	public static void register(IEventBus modEventBus)
-	{
-		ENCHANTMENTS.register(modEventBus);
-	}
-
-	public static RegistryObject<Enchantment> add(String name, Enchantment ench) {
-		return ENCHANTMENTS.register(name, () -> ench);
+	public static void register() {
+		ENCHANTMENTS.register(FMLJavaModLoadingContext.get().getModEventBus());
 	}
 }

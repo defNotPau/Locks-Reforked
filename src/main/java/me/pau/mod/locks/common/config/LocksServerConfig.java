@@ -1,13 +1,20 @@
 package me.pau.mod.locks.common.config;
 
+import java.util.Arrays;
 import java.util.List;
+import java.util.Objects;
 import java.util.regex.Pattern;
+import java.lang.System;
 
 import com.google.common.collect.Lists;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Registry;
+import net.minecraft.core.RegistryAccess;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.ForgeConfigSpec;
+import net.minecraftforge.registries.ForgeRegistries;
 
 public class LocksServerConfig {
 	public static final ForgeConfigSpec SPEC;
@@ -45,13 +52,14 @@ public class LocksServerConfig {
 	private LocksServerConfig() {}
 
 	public static void init() {
-		lockableBlocks = LOCKABLE_BLOCKS.get().stream().map(s -> Pattern.compile(s)).toArray(Pattern[]::new);
+		lockableBlocks = LOCKABLE_BLOCKS.get().stream().map(Pattern::compile).toArray(Pattern[]::new);
 	}
 
 	public static boolean canLock(Level world, BlockPos pos) {
-		String name = world.getBlockState(pos).getBlock().getName().toString();
+		Block block = world.getBlockState(pos).getBlock();
+		String name = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString();
 		for(Pattern p : lockableBlocks)
-			if(p.matcher(name).matches())
+			if (p.matcher(name).matches())
 				return true;
 		return false;
 	}
